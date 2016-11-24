@@ -48,6 +48,8 @@ for group_id in ['321052@N24']:
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute("""SELECT filepath from raw_images""")
+    
+    #Add existing db records to 'files' 
     files = cur.fetchall()
     group_pool_photos = []
     
@@ -69,7 +71,7 @@ for group_id in ['321052@N24']:
     if success:
         print 'Total photos {}'.format(len(group_pool_photos))
 
-    #get new photos and metadata
+    #diff filelist db id's with new flickr photo ids to download only new photos 
     filelist = str(files).strip('[]')  
     for photo in group_pool_photos:
         if photo['id'] in filelist:
