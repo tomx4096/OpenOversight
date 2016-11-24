@@ -1,4 +1,6 @@
 #Downloads highest resolution pics available from the Flickr Groups specified. Images with faces detected via Google Vision are added to the OpenOversight db
+#Image hashes are computed from the original image as soon as it's downloaded. These won't match the files after i've resized them.
+#Needs Flickr API key, Google Vision API and OpenOversight postgresql credentials. *Remove*
 import flickrapi
 import requests
 import pprint
@@ -42,7 +44,7 @@ for group_id in ['321052@N24']:
     success = True
 
     #Get list of existing photos from database
-    conn = psycopg2.connect("dbname='openoversight-dev' user='openoversight' host='localhost' password='terriblepassword' port='5433'")
+    conn = psycopg2.connect("dbname='openoversight-dev' user='openoversight' host='localhost' password='' port='5433'")
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute("""SELECT filepath from raw_images""")
@@ -68,8 +70,9 @@ for group_id in ['321052@N24']:
         print 'Total photos {}'.format(len(group_pool_photos))
 
     #get new photos and metadata
+    filelist = str(files).strip('[]')  
     for photo in group_pool_photos:
-        if photo['id'] in files:
+        if photo['id'] in filelist:
             print 'Found'
         else:
             photoinfo = flickr.photos.getInfo(photo_id=photo['id'])
@@ -84,19 +87,18 @@ for group_id in ['321052@N24']:
             picsize = flickr.photos.getSizes(photo_id=photo['id'])
             picurl = (picsize['sizes']['size'][-1]['source'])
             fname = picurl.split("/")[-1]
-            print fname
-            print photo['id']
+
             if os.path.isfile(fname):
                 print 'already downloaded'
             else:
                 filename = wget.download(picurl)
-                print 'filename is ' + filename
  
-    #Compute hash of original file downloaded - this is doing filename right now.
-            hash_object = hashlib.sha1(fname)
-            hex_dig = hash_object.hexdigest()
-            print(hex_dig)
-            hash_img = hex_dig
+    #Compute hash of original file
+            hasher = hashlib.sha256()
+            with open(fname, 'rb') as afile:
+                buf = afile.read()
+                hasher.update(buf)
+                hash_img = (hasher.hexdigest())           
         
     #Remove exif data
             piexif.remove(fname, fname)
@@ -106,8 +108,6 @@ for group_id in ['321052@N24']:
             filesize = statinfo.st_size
             if filesize > 8000000:
                 basewidth = 6000
-                print statinfo.st_size
-                print file
                 img = Image.open(fname)
                 wpercent = (basewidth / float(img.size[0]))
                 hsize = int((float(img.size[1]) * float(wpercent)))
@@ -115,8 +115,6 @@ for group_id in ['321052@N24']:
                 img.save(fname)
             if filesize > 4000000:
                 basewidth = 4000
-                print statinfo.st_size
-                print filename
                 img = Image.open(fname)
                 wpercent = (basewidth / float(img.size[0]))
                 hsize = int((float(img.size[1]) * float(wpercent)))
@@ -147,7 +145,7 @@ for group_id in ['321052@N24']:
                         cur.execute('INSERT INTO raw_images (filepath, hash_img, date_image_inserted, date_image_taken, is_tagged) VALUES (%s, %s, %s, %s, %s)', ("noface_" + fname, hash_img, date_image_inserted, taken, is_tagged))
                     else:
                         print results['faceAnnotations'][0]['detectionConfidence']
+                        print 'face detected'                        
                         date_image_inserted = datetime.date.today()
                         is_tagged = 'f'
                         cur.execute('INSERT INTO raw_images (filepath, hash_img, date_image_inserted, date_image_taken, is_tagged) VALUES (%s, %s, %s, %s, %s)', (fname, hash_img, date_image_inserted, taken, is_tagged))
-                        print 'done'                    
