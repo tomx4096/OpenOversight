@@ -11,7 +11,7 @@ from OpenOversight.app.main.forms import (FindOfficerIDForm, AssignmentForm,
 from OpenOversight.app.auth.forms import (LoginForm, RegistrationForm,
                                           ChangePasswordForm, PasswordResetForm,
                                           PasswordResetRequestForm,
-                                          ChangeEmailForm)
+                                          ChangeEmailForm, ChangeDefaultDepartmentForm)
 from OpenOversight.app.models import (User, Face, Department, Unit, Officer,
                                       Image)
 
@@ -870,3 +870,18 @@ def test_admin_can_add_new_unit(mockdata, client, session):
         unit = Unit.query.filter_by(
             descrip='Test').one()
         assert unit.department_id == department.id
+
+
+def test_user_can_change_dept_pref(mockdata, client, session):
+    with current_app.test_request_context():
+        login_user(client)
+
+        form = ChangeDefaultDepartmentForm(dept_pref=1)
+
+        rv = client.post(
+            url_for('auth.change_dept'),
+            data=form.data,
+            follow_redirects=True
+        )
+
+        assert 'Updated!' in rv.data

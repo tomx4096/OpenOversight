@@ -106,7 +106,12 @@ def profile(username):
         user = User.query.filter_by(username=username).one()
     else:
         abort(404)
-    return render_template('profile.html', user=user)
+    try:
+        pref = User.query.filter_by(id=current_user.id).one().dept_pref
+        department = Department.query.filter_by(id=pref).one().name
+    except NoResultFound:
+        department = None
+    return render_template('profile.html', user=user, department=department)
 
 
 @main.route('/officer/<int:officer_id>', methods=['GET', 'POST'])
@@ -433,8 +438,18 @@ def submit_complaint():
 @main.route('/submit', methods=['GET', 'POST'])
 @limiter.limit('5/minute')
 def submit_data():
-    departments = Department.query.all()
-    return render_template('submit_deptselect.html', departments=departments)
+    # try to use preferred department if available
+    try:
+        if User.query.filter_by(id=current_user.id).one().dept_pref:
+            department = User.query.filter_by(id=current_user.id).one().dept_pref
+            return redirect(url_for('main.submit_department_images', department_id=department))
+        else:
+            departments = Department.query.all()
+            return render_template('submit_deptselect.html', departments=departments)
+    # that is, an anonymous user has no id attribute
+    except AttributeError:
+        departments = Department.query.all()
+        return render_template('submit_deptselect.html', departments=departments)
 
 
 @main.route('/submit/department/<int:department_id>', methods=['GET', 'POST'])
