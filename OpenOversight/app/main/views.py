@@ -6,6 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 import sys
 import tempfile
+import piexif
+
 from traceback import format_exc
 from werkzeug import secure_filename
 
@@ -449,7 +451,11 @@ def upload(department_id):
     file_to_upload = request.files['file']
     if not allowed_file(file_to_upload.filename):
         return jsonify(error="File type not allowed!"), 415
-    original_filename = secure_filename(file_to_upload.filename)
+
+    data = piexif.load(file_to_upload.filename) # Dict with metadata
+    piexif.remove(original_filename)
+    empty = piexif.load(filename)
+    original_filename = secure_filename(empty)
     image_data = file_to_upload.read()
 
     # See if there is a matching photo already in the db
