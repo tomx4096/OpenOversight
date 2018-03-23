@@ -138,6 +138,56 @@ class AddOfficerForm(Form):
     submit = SubmitField(label='Add')
 
 
+class TrustedUserAddOfficerForm(Form):
+    photo = FileField(
+        'image', validators=[FileRequired(message='There was no file!'),
+                             FileAllowed(['png', 'jpg', 'jpeg'],
+                                         message='Images only!')]
+    )
+    first_name = StringField('First name', default='', validators=[
+        Regexp('\w*'), Length(max=50), Optional()])
+    last_name = StringField('Last name', default='', validators=[
+        Regexp('\w*'), Length(max=50), DataRequired()])
+    middle_initial = StringField('Middle initial', default='', validators=[
+        Regexp('\w*'), Length(max=50), Optional()])
+    race = SelectField('Race', default='Not Sure', choices=RACE_CHOICES,
+                       validators=[AnyOf(allowed_values(RACE_CHOICES))])
+    gender = SelectField('Gender', default='Not Sure', choices=GENDER_CHOICES,
+                         validators=[AnyOf(allowed_values(GENDER_CHOICES))])
+    star_no = StringField('Badge Number', default='', validators=[
+        Regexp('\w*'), Length(max=50)])
+    rank = SelectField('Rank', default='PO', choices=RANK_CHOICES,
+                       validators=[AnyOf(allowed_values(RANK_CHOICES))])
+    unit = QuerySelectField('Unit', validators=[Optional()],
+                            query_factory=unit_choices, get_label='descrip',
+                            allow_blank=True, blank_text=u'Unknown unit')
+    link_1 = StringField('Link (e.g. a media article or lawsuit)',
+        default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    link_text_1 = StringField('Link description',
+        default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    link_2 = StringField('Link (e.g. a media article or lawsuit)',
+        default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    link_text_2 = StringField('Link description',
+        default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    video_1 = StringField('Video 1', default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    video_2 = StringField('Video 2', default='',
+        validators=[
+            Regexp('\w*'), Length(max=200), Optional()])
+    free_text = StringField('Profile description', default='', validators=[
+        Regexp('\w*'), Length(max=2000), Optional()])
+    submit = SubmitField(label='Add')
+
+
 class BasicOfficerForm(Form):
     first_name = StringField('First name',
                              validators=[Regexp('\w*'), Length(max=50),

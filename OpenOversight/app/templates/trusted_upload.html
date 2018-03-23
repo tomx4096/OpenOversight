@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block content %}
+
+<link href="{{ url_for('static', filename='css/dropzone.css') }}" rel="stylesheet">
+
+<div class="container theme-showcase" role="main">
+
+  <div class="page-header">
+      <h1>Populate Officer Profile</h1>
+  </div>
+
+  <div class="col-md-6">
+      <form class="form" method="post" role="form">
+          {{ form.hidden_tag() }}
+          {{ wtf.form_errors(form, hiddens="only") }}
+          <h3>Basic officer information</h3>
+          <h4>Department: {{ department.name }}</h4>
+          {{ wtf.form_field(form.first_name, autofocus="autofocus") }}
+          {{ wtf.form_field(form.middle_initial) }}
+          {{ wtf.form_field(form.last_name) }}
+          {{ wtf.form_field(form.race) }}
+          {{ wtf.form_field(form.star_no) }}
+          {{ wtf.form_field(form.unit) }}
+          <h4><small><a href="{{ url_for( 'main.add_unit' )}}">Don't see the unit? Add one!</a></small></h4>
+          {{ wtf.form_field(form.gender) }}
+          <h3>Links to media articles, lawsuits, or other public resources</h3>
+          {{ wtf.form_field(form.link_1) }}
+          {{ wtf.form_field(form.link_text_1) }}
+          {{ wtf.form_field(form.link_2) }}
+          {{ wtf.form_field(form.link_text_2) }}
+          <a class="btn btn-primary" role="button">Add more links</a>
+          <h3>Links to videos</h3>
+          {{ wtf.form_field(form.video_1) }}
+          {{ wtf.form_field(form.video_2) }}
+          <a class="btn btn-primary" role="button">Add more videos</a>
+          <h3>Description</h3>
+          <p>This free text will appear on the officer's profile attributed to your username <code>{{ user.username }}</code>.
+          Please do not add any text you do not want to become immediately public.</p>
+          {{ wtf.form_field(form.free_text, rows=50) }}
+          {{ wtf.form_field(form.submit, id="submit", button_map={'submit':'primary'}) }}
+      </form>
+      <br>
+  </div>
+
+  <h3>Drop all images here containing this officer:</h3>
+  <form action="/upload/department/{{ department.id }}" class="dropzone" id="my-cop-dropzone">
+  </form>
+    <p class="small">Drag photographs from your computer directly into the box above or click the box to launch a finder window. If you are on mobile, you can click the box above to select pictures from your photo library or camera roll.</p>
+  <script>
+  $(document).ready(function(){
+    Dropzone.options.myCopDropzone = {
+      url: "/upload/department/{{ department.id }}",
+      method: "POST",
+      uploadMultiple: false,
+      parallelUploads: 50,
+      acceptedFiles: "image/png, image/jpeg, image/gif, image/jpg",
+      maxFiles: 50,
+      init: function() {
+        this.on("error", function(file, responseText) {
+          file.previewTemplate.appendChild(document.createTextNode(responseText));
+        });
+      }
+    }
+
+  });
+  </script>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dropzone.js') }}"></script>
+
+{% endblock %}

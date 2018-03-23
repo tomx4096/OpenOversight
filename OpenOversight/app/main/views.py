@@ -21,7 +21,7 @@ from ..utils import (grab_officers, roster_lookup, upload_file, compute_hash,
                      add_officer_profile, edit_officer_profile)
 from .forms import (FindOfficerForm, FindOfficerIDForm, AddUnitForm,
                     FaceTag, AssignmentForm, DepartmentForm, AddOfficerForm,
-                    BasicOfficerForm)
+                    BasicOfficerForm, TrustedUserAddOfficerForm)
 from ..models import (db, Image, User, Face, Officer, Assignment, Department,
                       Unit)
 
@@ -443,6 +443,14 @@ def submit_department_images(department_id=1):
     department = Department.query.filter_by(id=department_id).one()
     return render_template('submit_department.html', department=department)
 
+
+@main.route('/trusted_upload/department/<int:department_id>', methods=['GET', 'POST'])
+@login_required
+def trusted_upload(department_id):
+    form = TrustedUserAddOfficerForm()
+    department = Department.query.filter_by(id=department_id).one()
+    return render_template('trusted_upload.html', department=department,
+                           form=form, user=current_user)
 
 @main.route('/upload/department/<int:department_id>', methods=['POST'])
 @limiter.limit('250/minute')
