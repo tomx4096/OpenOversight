@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
-{% block content %}
-<link href="{{ url_for('static', filename='css/cropper.css') }}" rel="stylesheet">
-<link href="{{ url_for('static', filename='css/tagger.css') }}" rel="stylesheet">
-<script src="{{ url_for('static', filename='js/cropper.js') }}"></script>
-<script src="{{ url_for('static', filename='js/tagger.js') }}"></script>
-<div class="container theme-showcase" role="main">
+{% block head %}
+  <link href="{{ url_for('static', filename='css/cropper.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/tagger.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='js/cropper.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/tagger.js') }}"></script>
+{% endblock %}
 
+{% block content %}
+
+<div class="container theme-showcase" role="main">
     {% if current_user and current_user.is_authenticated %}
       {% if image and current_user.is_disabled == False %}
       <div class="row">
