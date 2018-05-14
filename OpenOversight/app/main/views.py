@@ -433,6 +433,7 @@ def label_data(department_id=None, image_id=None):
                            face_position_y=form.dataY.data,
                            face_width=form.dataWidth.data,
                            face_height=form.dataHeight.data,
+                           rotate=form.dataRotate.data,
                            user_id=current_user.id)
             db.session.add(new_tag)
             db.session.commit()

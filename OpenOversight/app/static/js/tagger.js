@@ -13,6 +13,7 @@ $(function () {
   var $dataRotate = $('#dataRotate');
   var $dataScaleX = $('#dataScaleX');
   var $dataScaleY = $('#dataScaleY');
+
   var options = {
         aspectRatio: NaN,
         preview: '.img-preview',
@@ -24,7 +25,8 @@ $(function () {
           $dataRotate.val(e.rotate);
           $dataScaleX.val(e.scaleX);
           $dataScaleY.val(e.scaleY);
-        }
+        },
+        rotatable: true
       };
   var originalImageURL = $image.attr('src');
   var uploadedImageURL;
@@ -69,7 +71,7 @@ $(function () {
 
 
   // Download
-  if (typeof $download[0].download === 'undefined') {
+  if (!$download[0] || typeof $download[0].download === 'undefined') {
     $download.addClass('disabled');
   }
 
@@ -104,7 +106,8 @@ $(function () {
 
 
   // Methods
-  $('.docs-buttons').on('click', '[data-method]', function () {
+  $('.docs-buttons').on('click', '[data-method]', function (event) {
+    event.preventDefault()
     var $this = $(this);
     var data = $this.data();
     var $target;

@@ -23,6 +23,20 @@
           <div class="subtle-pad">
             <img class="center-block img-responsive" id="image" src="{{ path }}" alt="Picture">
           </div>
+          <div class="col-md-6 docs-buttons">
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary" data-method="rotate" data-option="-90" title="Rotate Left">
+                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Rotate left 90 degrees">
+                  <span class="fa fa-rotate-left"></span>
+                </span>
+              </button>
+              <button type="button" class="btn btn-primary" data-method="rotate" data-option="90" title="Rotate Right">
+                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Rotate right 90 degrees">
+                  <span class="fa fa-rotate-right"></span>
+                </span>
+              </button>
+            </div>
+          </div>
       </div>
 
       <div class="row">
@@ -71,6 +85,13 @@
                 <input type="text" class="hidden form-control" name="dataHeight" id="dataHeight" placeholder="height">
               </div>
               {% for error in form.dataHeight.errors %}
+                <p><span style="color: red;">[{{ error }}]</span></p>
+              {% endfor %}
+
+              <div class="input-group input-group-sm">
+                <input type="text" class="hidden form-control" name="dataRotate" id="dataRotate" placeholder="rotate">
+              </div>
+              {% for error in form.dataRotate.errors %}
                 <p><span style="color: red;">[{{ error }}]</span></p>
               {% endfor %}
 

@@ -67,6 +67,12 @@ class FindOfficerIDForm(Form):
                             query_factory=dept_choices, get_label='name')
 
 
+class DataOrZeroRequired(DataRequired):
+    def __call__(self, form, field):
+        if not field.data == 0:
+            super(DataOrZeroRequired, self).__call__(form, field)
+
+
 class FaceTag(Form):
     officer_id = IntegerField('officer_id', validators=[DataRequired()])
     image_id = IntegerField('image_id', validators=[DataRequired()])
@@ -74,6 +80,7 @@ class FaceTag(Form):
     dataY = IntegerField('dataY', validators=[DataRequired()])
     dataWidth = IntegerField('dataWidth', validators=[DataRequired()])
     dataHeight = IntegerField('dataHeight', validators=[DataRequired()])
+    dataRotate = IntegerField('dataRotate', validators=[DataOrZeroRequired()])
 
 
 class AssignmentForm(Form):

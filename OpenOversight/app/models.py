@@ -82,6 +82,7 @@ class Face(db.Model):
     face_position_y = db.Column(db.Integer, unique=False)
     face_width = db.Column(db.Integer, unique=False)
     face_height = db.Column(db.Integer, unique=False)
+    rotate = db.Column(db.Integer, unique=False)
     image = db.relationship('Image', backref='faces')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user = db.relationship('User', backref='faces')
