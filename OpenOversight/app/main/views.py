@@ -321,7 +321,7 @@ def add_officer():
     if form.validate_on_submit():
         officer = add_officer_profile(form, current_user)
         flash('New Officer {} added to OpenOversight'.format(officer.last_name))
-        return redirect(url_for('main.officer_profile', officer_id=officer.id))
+        return redirect(url_for('main.submit_officer_images', officer_id=officer.id))
     else:
         return render_template('add_officer.html', form=form)
 
@@ -565,9 +565,27 @@ def submit_department_images(department_id=1):
     return render_template('submit_department.html', department=department)
 
 
+@main.route('/submit/officer/<int:officer_id>', methods=['GET', 'POST'])
+@limiter.limit('5/minute')
+@ac_or_admin_required
+def submit_officer_images(officer_id=1):
+    officer = Officer.query.get_or_404(officer_id)
+    return render_template('submit_officer_image.html', officer=officer)
+
+
 @main.route('/upload/department/<int:department_id>', methods=['POST'])
+@main.route('/upload/department/<int:department_id>/officer/<int:officer_id>', methods=['POST'])
 @limiter.limit('250/minute')
-def upload(department_id):
+def upload(department_id, officer_id=None):
+    # if there's an officer, find them
+    if officer_id:
+        officer = Officer.query.filter_by(id=officer_id)
+        if not officer:
+            return jsonify(error="Officer not found!"), 404
+            # only acs and admins can directly submit officer photos
+            if not current_user.is_administrator or \
+                (current_user.is_area_coordinator and current_user.ac_department_id == officer.department_id):
+                return jsonify(error="You are not permitted to do this action"), 403
     file_to_upload = request.files['file']
     if not allowed_file(file_to_upload.filename):
         return jsonify(error="File type not allowed!"), 415
@@ -601,6 +619,11 @@ def upload(department_id):
                           department_id=department_id,
                           # TODO: Get the following field from exif data
                           date_image_taken=datetime.datetime.now())
+        if officer:
+            new_face =  Face(officer_id=officer_id,
+                           image=new_image,
+                           user_id=current_user.id)
+            db.session.add(new_face)
         db.session.add(new_image)
         db.session.commit()
         return jsonify(success="Success!"), 200

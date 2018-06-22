@@ -707,6 +707,20 @@ def test_ac_cannot_add_new_unit_not_in_their_dept(mockdata, client, session):
         assert unit is None
 
 
+def test_ac_cannot_directly_upload_photos_of_of_non_dept_officers(mockdata, client, session):
+    with current_app.test_request_context():
+        login_ac(client)
+        department = Department.query.except_(Department.query.filter_by(id=AC_DEPT)).first()
+        rv = client.post(
+            url_for('main.upload', department_id=department.id, officer_id=department.officers[0])
+        )
+        assert rv.status_code == 403
+
+
+def test_ac_can_upload_photos_of_dept_officers(mockdata, client, session):
+    pass
+
+
 # def test_find_form_submission(client, mockdata):
 #     with current_app.test_request_context():
 #         form = FindOfficerForm()
