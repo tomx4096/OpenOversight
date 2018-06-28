@@ -81,6 +81,16 @@ class Officer(db.Model):
                                                   self.last_name)
 
 
+class Event(db.Model):
+    __tablename__ = 'events'
+
+    id = db.Column(db.Integer, primary_key=True)
+    officer_id = db.Column(db.Integer, db.ForeignKey('officers.id'))
+    event_date = db.Column(db.DateTime, index=True, nullable=False)
+    event_type = db.Column(db.String(100), index=True, nullable=False)
+    comment = db.Column(db.Text(), nullable=True)
+
+
 class Assignment(db.Model):
     __tablename__ = 'assignments'
 
