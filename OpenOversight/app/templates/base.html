@@ -11,6 +11,10 @@
     <title>OpenOversight - a Lucy Parsons Labs project</title>
 
     <!-- Bootstrap core CSS -->
+    {% assets "scss_all" %}
+      <link rel=stylesheet type=text/css href="{{ ASSET_URL }}">
+    {% endassets %}
+
     <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->

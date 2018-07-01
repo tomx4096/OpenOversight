@@ -2,6 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, render_template
+from flask_assets import Environment, Bundle
 from flask_bootstrap import Bootstrap
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -9,7 +10,6 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 from config import config
-
 
 bootstrap = Bootstrap()
 mail = Mail()
@@ -24,6 +24,7 @@ limiter = Limiter(key_func=get_remote_address,
 
 def create_app(config_name='default'):
     app = Flask(__name__)
+
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     from .models import db  # noqa
@@ -33,6 +34,9 @@ def create_app(config_name='default'):
     db.init_app(app)
     login_manager.init_app(app)
     limiter.init_app(app)
+    assets = Environment(app)
+    scss = Bundle('scss/index.scss', filters='pyscss', output='all.css')
+    assets.register('scss_all', scss)
 
     from .main import main as main_blueprint  # noqa
     app.register_blueprint(main_blueprint)
