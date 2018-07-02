@@ -26,7 +26,8 @@ services:
      HMR: 1
    volumes:
      - ./OpenOversight/:/usr/src/app/OpenOversight/
-     - cache_dir:/usr/src/app/.cache
+     - /usr/src/app/.cache/
+     - /usr/src/app/OpenOversight/static/dist/
    links:
      - postgres:postgres
    expose:
