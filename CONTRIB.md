@@ -39,6 +39,9 @@ $ docker exec -it openoversight_web_1 /bin/bash
 
 Once you're done, `make stop` and `make clean` to stop and remove the containers respectively.
 
+If you want to use the interactive Python Flask debugger, you can use the browser-based console
+with the PIN that will be visible via `docker-compose logs`.
+
 ### VirtualBox + Vagrant
 
 Our standard development environment is an Ubuntu 14 VM. We manage it with Vagrant, which means you'll need Vagrant and VirtualBox installed to start out.
