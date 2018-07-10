@@ -158,7 +158,7 @@ def test_ac_cannot_delete_tag_in_their_dept(mockdata, client, session):
 def test_user_can_add_tag(mockdata, client, session, monkeypatch):
     with current_app.test_request_context():
         mock = MagicMock(return_value=Image.query.first())
-        with patch('OpenOversight.app.main.views.get_uploaded_cropped_image', mock):
+        with patch('OpenOversight.app.main.views.get_uploaded_image', mock):
             login_user(client)
             officer = Image.query.filter_by(department_id=1).first()
             image = Image.query.filter_by(department_id=1).first()
@@ -174,7 +174,7 @@ def test_user_can_add_tag(mockdata, client, session, monkeypatch):
                 data=form.data,
                 follow_redirects=True
             )
-            views.get_uploaded_cropped_image.assert_called_once()
+            views.get_uploaded_image.assert_called_once()
             assert 'Tag added to database' in rv.data
 
 

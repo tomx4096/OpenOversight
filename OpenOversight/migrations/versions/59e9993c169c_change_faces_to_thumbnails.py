@@ -7,7 +7,7 @@ Create Date: 2018-06-04 19:04:23.524079
 """
 
 from app.models import Face, db
-from app.utils import get_uploaded_cropped_image
+from app.utils import get_uploaded_image
 
 
 # revision identifiers, used by Alembic.
@@ -27,7 +27,7 @@ def upgrade():
                 right = left + face.face_width
                 lower = upper + face.face_height
 
-                cropped_image = get_uploaded_cropped_image(face.image, (left, upper, right, lower))
+                cropped_image = get_uploaded_image(face.image, (left, upper, right, lower))
 
                 new_face = Face(
                     officer_id=face.officer_id,
