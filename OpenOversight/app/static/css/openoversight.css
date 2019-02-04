@@ -417,9 +417,3 @@ a > .tutorial{
 .pt-35 {
     padding-top: 35px;
 }
-
-.browse-form-input{
-    display: inline-block;
-    vertical-align: middle;
-    width: 190px;
-}

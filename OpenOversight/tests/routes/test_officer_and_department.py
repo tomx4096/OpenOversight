@@ -1,7 +1,6 @@
 # Routing and view tests
 import pytest
 import random
-from datetime import datetime
 from flask import url_for, current_app
 from ..conftest import AC_DEPT
 from OpenOversight.app.utils import dept_choices
@@ -12,11 +11,9 @@ from .route_helpers import login_admin, login_ac, process_form_data
 from OpenOversight.app.main.forms import (AssignmentForm, DepartmentForm,
                                           AddOfficerForm, AddUnitForm,
                                           EditOfficerForm, LinkForm,
-                                          EditDepartmentForm, IncidentForm,
-                                          LocationForm, LicensePlateForm,
-                                          BrowseForm)
+                                          EditDepartmentForm,)
 
-from OpenOversight.app.models import Department, Unit, Officer, Incident
+from OpenOversight.app.models import Department, Unit, Officer
 
 
 @pytest.mark.parametrize("route", [
@@ -59,7 +56,7 @@ def test_user_can_access_officer_profile(mockdata, client, session):
             url_for('main.officer_profile', officer_id=3),
             follow_redirects=True
         )
-        assert 'Officer Detail' in rv.data.decode('utf-8')
+        assert 'Officer Detail' in rv.data
 
 
 def test_user_can_access_officer_list(mockdata, client, session):
@@ -68,7 +65,7 @@ def test_user_can_access_officer_list(mockdata, client, session):
             url_for('main.list_officer', department_id=2)
         )
 
-        assert 'Officers' in rv.data.decode('utf-8')
+        assert 'Officers' in rv.data
 
 
 def test_ac_can_access_admin_on_dept_officer_profile(mockdata, client, session):
@@ -80,7 +77,7 @@ def test_ac_can_access_admin_on_dept_officer_profile(mockdata, client, session):
             url_for('main.officer_profile', officer_id=officer.id),
             follow_redirects=True
         )
-        assert 'Admin only' in rv.data.decode('utf-8')
+        assert 'Admin only' in rv.data
 
 
 def test_ac_cannot_access_admin_on_non_dept_officer_profile(mockdata, client, session):
@@ -92,7 +89,7 @@ def test_ac_cannot_access_admin_on_non_dept_officer_profile(mockdata, client, se
             url_for('main.officer_profile', officer_id=officer.id),
             follow_redirects=True
         )
-        assert 'Admin only' not in rv.data.decode('utf-8')
+        assert 'Admin only' not in rv.data
 
 
 def test_admin_can_add_officer_badge_number(mockdata, client, session):
@@ -108,7 +105,7 @@ def test_admin_can_add_officer_badge_number(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Added new assignment' in rv.data.decode('utf-8')
+        assert 'Added new assignment' in rv.data
 
 
 def test_ac_can_add_officer_badge_number_in_their_dept(mockdata, client, session):
@@ -125,7 +122,7 @@ def test_ac_can_add_officer_badge_number_in_their_dept(mockdata, client, session
             follow_redirects=True
         )
 
-        assert 'Added new assignment' in rv.data.decode('utf-8')
+        assert 'Added new assignment' in rv.data
 
         # test that assignment exists in database
         assignment = Officer.query.filter(Officer.assignments.any(star_no='S1234'))
@@ -173,7 +170,7 @@ def test_admin_can_edit_officer_badge_number(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Edited officer assignment' in rv.data.decode('utf-8')
+        assert 'Edited officer assignment' in rv.data
         assert officer.assignments[0].star_no == '12345'
 
 
@@ -204,7 +201,7 @@ def test_ac_can_edit_officer_in_their_dept_badge_number(mockdata, client, sessio
             follow_redirects=True
         )
 
-        assert 'Edited officer assignment' in rv.data.decode('utf-8')
+        assert 'Edited officer assignment' in rv.data
         assert officer.assignments[0].star_no == new_star_no
 
 
@@ -251,7 +248,7 @@ def test_admin_can_add_police_department(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'New department' in rv.data.decode('utf-8')
+        assert 'New department' in rv.data
 
         # Check the department was added to the database
         department = Department.query.filter_by(
@@ -296,7 +293,7 @@ def test_admin_cannot_add_duplicate_police_department(mockdata, client,
             follow_redirects=True
         )
 
-        assert 'already exists' in rv.data.decode('utf-8')
+        assert 'already exists' in rv.data
 
         # Check that only one department was added to the database
         # one() method will throw exception if more than one department found
@@ -318,7 +315,7 @@ def test_admin_can_edit_police_department(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'New department' in misspelled_rv.data.decode('utf-8')
+        assert 'New department' in misspelled_rv.data
 
         department = Department.query.filter_by(name='Misspelled Police Department').one()
 
@@ -331,7 +328,7 @@ def test_admin_can_edit_police_department(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Department Corrected Police Department edited' in corrected_rv.data.decode('utf-8')
+        assert 'Department Corrected Police Department edited' in corrected_rv.data
 
         # Check the department with the new name is now in the database.
         corrected_department = Department.query.filter_by(
@@ -351,7 +348,7 @@ def test_admin_can_edit_police_department(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Department Corrected Police Department edited' in edit_short_name_rv.data.decode('utf-8')
+        assert 'Department Corrected Police Department edited' in edit_short_name_rv.data
 
         edit_short_name_department = Department.query.filter_by(
             name='Corrected Police Department').one()
@@ -390,7 +387,7 @@ def test_admin_cannot_duplicate_police_department_during_edit(mockdata, client,
             follow_redirects=True
         )
 
-        assert 'New department' in existing_dep_rv.data.decode('utf-8')
+        assert 'New department' in existing_dep_rv.data
 
         new_dep_form = DepartmentForm(name='New Police Department',
                                       short_name='NPD')
@@ -401,7 +398,7 @@ def test_admin_cannot_duplicate_police_department_during_edit(mockdata, client,
             follow_redirects=True
         )
 
-        assert 'New department' in new_dep_rv.data.decode('utf-8')
+        assert 'New department' in new_dep_rv.data
 
         new_department = Department.query.filter_by(
             name='New Police Department').one()
@@ -415,7 +412,7 @@ def test_admin_cannot_duplicate_police_department_during_edit(mockdata, client,
             follow_redirects=True
         )
 
-        assert 'already exists' in rv.data.decode('utf-8')
+        assert 'already exists' in rv.data
 
         # make sure original department is still here
         existing_department = Department.query.filter_by(
@@ -438,7 +435,7 @@ def test_expected_dept_appears_in_submission_dept_selection(mockdata, client,
             follow_redirects=True
         )
 
-        assert 'Springfield Police Department' in rv.data.decode('utf-8')
+        assert 'Springfield Police Department' in rv.data
 
 
 def test_admin_can_add_new_officer(mockdata, client, session):
@@ -468,7 +465,7 @@ def test_admin_can_add_new_officer(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'McTesterson' in rv.data.decode('utf-8')
+        assert 'McTesterson' in rv.data
 
         # Check the officer was added to the database
         officer = Officer.query.filter_by(
@@ -508,7 +505,7 @@ def test_ac_can_add_new_officer_in_their_dept(mockdata, client, session):
         )
 
         assert rv.status_code == 200
-        assert last_name in rv.data.decode('utf-8')
+        assert last_name in rv.data
 
         # Check the officer was added to the database
         officer = Officer.query.filter_by(
@@ -591,10 +588,10 @@ def test_admin_can_edit_existing_officer(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Changed' in rv.data.decode('utf-8')
-        assert 'Testerinski' not in rv.data.decode('utf-8')
-        assert link_url0 in rv.data.decode('utf-8')
-        assert link_url1 not in rv.data.decode('utf-8')
+        assert 'Changed' in rv.data
+        assert 'Testerinski' not in rv.data
+        assert link_url0 in rv.data
+        assert link_url1 not in rv.data
 
 
 def test_ac_cannot_edit_officer_not_in_their_dept(mockdata, client, session):
@@ -639,7 +636,7 @@ def test_ac_can_see_officer_not_in_their_dept(mockdata, client, session):
 
         assert rv.status_code == 200
         # Testing names doesn't work bc the way we display them varies
-        assert str(officer.id) in rv.data.decode('utf-8')
+        assert str(officer.id) in rv.data
 
 
 def test_ac_can_edit_officer_in_their_dept(mockdata, client, session):
@@ -695,8 +692,8 @@ def test_ac_can_edit_officer_in_their_dept(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert new_last_name in rv.data.decode('utf-8')
-        assert last_name not in rv.data.decode('utf-8')
+        assert new_last_name in rv.data
+        assert last_name not in rv.data
 
         # Check the changes were added to the database
         officer = Officer.query.filter_by(
@@ -727,7 +724,7 @@ def test_admin_adds_officer_without_middle_initial(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'McTesty' in rv.data.decode('utf-8')
+        assert 'McTesty' in rv.data
 
         # Check the officer was added to the database
         officer = Officer.query.filter_by(
@@ -762,7 +759,7 @@ def test_admin_adds_officer_with_letter_in_badge_no(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'Testersly' in rv.data.decode('utf-8')
+        assert 'Testersly' in rv.data
 
         # Check the officer was added to the database
         officer = Officer.query.filter_by(
@@ -787,7 +784,7 @@ def test_admin_can_add_new_unit(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'New unit' in rv.data.decode('utf-8')
+        assert 'New unit' in rv.data
 
         # Check the unit was added to the database
         unit = Unit.query.filter_by(
@@ -809,7 +806,7 @@ def test_ac_can_add_new_unit_in_their_dept(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'New unit' in rv.data.decode('utf-8')
+        assert 'New unit' in rv.data
 
         # Check the unit was added to the database
         unit = Unit.query.filter_by(
@@ -864,7 +861,7 @@ def test_admin_can_add_new_officer_with_suffix(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert 'McTesty' in rv.data.decode('utf-8')
+        assert 'McTesty' in rv.data
 
         # Check the officer was added to the database
         officer = Officer.query.filter_by(
@@ -874,200 +871,6 @@ def test_admin_can_add_new_officer_with_suffix(mockdata, client, session):
         assert officer.gender == 'M'
         assert officer.suffix == 'Jr'
 
-
-def test_officer_csv(mockdata, client, session):
-    with current_app.test_request_context():
-        login_admin(client)
-        department = random.choice(dept_choices())
-        links = [
-            LinkForm(url='http://www.pleasework.com', link_type='link').data,
-        ]
-        form = AddOfficerForm(first_name='CKtVwe2gqhAIc',
-                              last_name='FVkcjigWUeUyA',
-                              middle_initial='T',
-                              suffix='Jr',
-                              race='WHITE',
-                              gender='M',
-                              star_no=90009,
-                              rank='PO',
-                              department=department.id,
-                              birth_year=1910,
-                              links=links)
-        # add the officer
-        rv = client.post(
-            url_for('main.add_officer'),
-            data=process_form_data(form.data),
-            follow_redirects=True
-        )
-        # dump officer csv
-        rv = client.get(
-            url_for('main.download_dept_csv', department_id=department.id),
-            follow_redirects=True
-        )
-        # get csv entry matching officer last n"createdame
-        csv = list(filter(lambda row: form.last_name.data in row, rv.data.decode('utf-8').split("\n")))
-        assert len(csv) == 1
-        assert form.first_name.data in csv[0]
-        assert form.last_name.data in csv[0]
-        assert form.rank.data in csv[0]
-
-
-def test_incidents_csv(mockdata, client, session):
-    with current_app.test_request_context():
-        login_admin(client)
-        department = random.choice(dept_choices())
-
-        # Delete existing incidents for chosen department
-        Incident.query.filter_by(department_id=department.id).delete()
-
-        incident_date = datetime(2000, 5, 25, 1, 45)
-        report_number = '42'
-
-        address_form = LocationForm(street_name='ABCDE', city='FGHI', state='IA')
-        link_form = LinkForm(url='http://example.com', link_type='video')
-        license_plates_form = LicensePlateForm(state='AZ')
-        form = IncidentForm(
-            date_field=str(incident_date.date()),
-            time_field=str(incident_date.time()),
-            report_number=report_number,
-            description='Something happened',
-            department=str(department.id),
-            department_id=department.id,
-            address=address_form.data,
-            links=[link_form.data],
-            license_plates=[license_plates_form.data],
-            officers=[]
-        )
-        # add the incident
-        rv = client.post(
-            url_for('main.incident_api') + 'new',
-            data=process_form_data(form.data),
-            follow_redirects=True
-        )
-        assert "created" in rv.data.decode('utf-8')
-        # dump incident csv
-        rv = client.get(
-            url_for('main.download_incidents_csv', department_id=department.id),
-            follow_redirects=True
-        )
-
-        # get the csv entry with matching report number
-        csv = list(filter(lambda row: report_number in row, rv.data.decode('utf-8').split("\n")))
-        print(csv)
-        assert len(csv) == 1
-        assert form.description.data in csv[0]
-
-
-def test_browse_filtering_filters_bad(client, mockdata, session):
-    with current_app.test_request_context():
-        race_list = ["BLACK", "WHITE"]
-        gender_list = ["M", "F"]
-        rank_list = ["COMMANDER", "PO"]
-        department_id = Department.query.first().id
-
-        # Test that nothing incorrect appears in filtered data
-        for race in race_list:
-            for gender in gender_list:
-                for rank in rank_list:
-                    form = BrowseForm(race=race,
-                                      gender=gender,
-                                      rank=rank,
-                                      min_age=16,
-                                      max_age=100)
-
-                    data = process_form_data(form.data)
-
-                    rv = client.post(
-                        url_for('main.list_officer', department_id=department_id),
-                        data=data,
-                        follow_redirects=True
-                    )
-
-                    # Test that the combinations that should be filtered
-                    # do not appear in the data
-                    filter_list = rv.data.decode('utf-8').split("<dt>Race</dt>")[1:]
-                    if race == "BLACK":
-                        bad_substr = "<dd>White</dd>"
-                    else:
-                        bad_substr = "<dd>Black</dd>"
-                    assert not any(bad_substr in token for token in filter_list)
-
-                    filter_list = rv.data.decode('utf-8').split("<dt>Gender</dt>")[1:]
-                    if gender == "M":
-                        bad_substr = "<dd>F</dd>"
-                    else:
-                        bad_substr = "<dd>M</dd>"
-                    assert not any(bad_substr in token for token in filter_list)
-
-                    filter_list = rv.data.decode('utf-8').split("<dt>Rank</dt>")[1:]
-                    if rank == "COMMANDER":
-                        bad_substr = "<dd>PO</dd>"
-                    else:
-                        bad_substr = "<dd>COMMANDER</dd>"
-                    assert not any(bad_substr in token for token in filter_list)
-
-
-def test_browse_filtering_allows_good(client, mockdata, session):
-    with current_app.test_request_context():
-        department_id = Department.query.first().id
-
-        # Add a officer with a specific race, gender, rank and age to the first page
-        login_admin(client)
-        links = [
-            LinkForm(url='http://www.pleasework.com', link_type='link').data,
-            LinkForm(url='http://www.avideo/?v=2345jk', link_type='video').data
-        ]
-        form = AddOfficerForm(first_name='A',
-                              last_name='A',
-                              middle_initial='A',
-                              race='WHITE',
-                              gender='M',
-                              star_no=666,
-                              rank='COMMANDER',
-                              department=department_id,
-                              birth_year=1990,
-                              links=links)
-
-        data = process_form_data(form.data)
-
-        rv = client.post(
-            url_for('main.add_officer'),
-            data=data,
-            follow_redirects=True
-        )
-
-        assert 'A' in rv.data.decode('utf-8')
-
-        # Check the officer was added to the database
-        officer = Officer.query.filter_by(
-            last_name='A').one()
-        assert officer.first_name == 'A'
-        assert officer.race == 'WHITE'
-        assert officer.gender == 'M'
-
-        # Check that added officer appears when filtering for this race, gender, rank and age
-        form = BrowseForm(race='WHITE',
-                          gender='M',
-                          rank='COMMANDER',
-                          min_age=datetime.now().year - 1991,
-                          max_age=datetime.now().year - 1989)
-
-        data = process_form_data(form.data)
-
-        rv = client.get(
-            url_for('main.list_officer', department_id=department_id),
-            data=data,
-            follow_redirects=True
-        )
-
-        filter_list = rv.data.decode('utf-8').split("<dt>Race</dt>")[1:]
-        assert any("<dd>White</dd>" in token for token in filter_list)
-
-        filter_list = rv.data.decode('utf-8').split("<dt>Rank</dt>")[1:]
-        assert any("<dd>COMMANDER</dd>" in token for token in filter_list)
-
-        filter_list = rv.data.decode('utf-8').split("<dt>Gender</dt>")[1:]
-        assert any("<dd>M</dd>" in token for token in filter_list)
 
 # def test_find_form_submission(client, mockdata):
 #     with current_app.test_request_context():
