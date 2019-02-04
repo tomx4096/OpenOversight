@@ -1,10 +1,7 @@
 # Routing and view tests
 import pytest
 from flask import url_for, current_app
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urlparse import urlparse
 from .route_helpers import login_user
 
 from OpenOversight.app.auth.forms import (LoginForm, RegistrationForm,
@@ -55,7 +52,7 @@ def test_invalid_user_cannot_login(mockdata, client, session):
             url_for('auth.login'),
             data=form.data
         )
-        assert b'Invalid username or password.' in rv.data
+        assert 'Invalid username or password.' in rv.data
 
 
 def test_user_can_logout(mockdata, client, session):
@@ -66,7 +63,7 @@ def test_user_can_logout(mockdata, client, session):
             url_for('auth.logout'),
             follow_redirects=True
         )
-        assert b'You have been logged out.' in rv.data
+        assert 'You have been logged out.' in rv.data
 
 
 def test_user_cannot_register_with_existing_email(mockdata, client, session):
@@ -83,7 +80,7 @@ def test_user_cannot_register_with_existing_email(mockdata, client, session):
 
         # Form will return 200 only if the form does not validate
         assert rv.status_code == 200
-        assert b'Email already registered' in rv.data
+        assert 'Email already registered' in rv.data
 
 
 def test_user_cannot_register_if_passwords_dont_match(mockdata, client, session):
@@ -100,7 +97,7 @@ def test_user_cannot_register_if_passwords_dont_match(mockdata, client, session)
 
         # Form will return 200 only if the form does not validate
         assert rv.status_code == 200
-        assert b'Passwords must match' in rv.data
+        assert 'Passwords must match' in rv.data
 
 
 def test_user_can_register_with_legit_credentials(mockdata, client, session):
@@ -116,7 +113,7 @@ def test_user_can_register_with_legit_credentials(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'A confirmation email has been sent to you.' in rv.data
+        assert 'A confirmation email has been sent to you.' in rv.data
 
 
 def test_user_cannot_register_with_weak_password(mockdata, client, session):
@@ -131,7 +128,7 @@ def test_user_cannot_register_with_weak_password(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'A confirmation email has been sent to you.' not in rv.data
+        assert 'A confirmation email has been sent to you.' not in rv.data
 
 
 def test_user_can_get_a_confirmation_token_resent(mockdata, client, session):
@@ -143,7 +140,7 @@ def test_user_can_get_a_confirmation_token_resent(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'A new confirmation email has been sent to you.' in rv.data
+        assert 'A new confirmation email has been sent to you.' in rv.data
 
 
 def test_user_can_get_password_reset_token_sent(mockdata, client, session):
@@ -156,7 +153,7 @@ def test_user_can_get_password_reset_token_sent(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'An email with instructions to reset your password' in rv.data
+        assert 'An email with instructions to reset your password' in rv.data
 
 
 def test_user_can_get_reset_password_with_valid_token(mockdata, client, session):
@@ -173,7 +170,7 @@ def test_user_can_get_reset_password_with_valid_token(mockdata, client, session)
             follow_redirects=True
         )
 
-        assert b'Your password has been updated.' in rv.data
+        assert 'Your password has been updated.' in rv.data
 
 
 def test_user_cannot_reset_password_with_invalid_token(mockdata, client, session):
@@ -189,7 +186,7 @@ def test_user_cannot_reset_password_with_invalid_token(mockdata, client, session
             follow_redirects=True
         )
 
-        assert b'Your password has been updated.' not in rv.data
+        assert 'Your password has been updated.' not in rv.data
 
 
 def test_user_cannot_get_email_reset_token_sent_without_valid_password(mockdata, client, session):
@@ -204,7 +201,7 @@ def test_user_cannot_get_email_reset_token_sent_without_valid_password(mockdata,
             follow_redirects=True
         )
 
-        assert b'An email with instructions to confirm your new email' not in rv.data
+        assert 'An email with instructions to confirm your new email' not in rv.data
 
 
 def test_user_can_get_email_reset_token_sent_with_password(mockdata, client, session):
@@ -219,7 +216,7 @@ def test_user_can_get_email_reset_token_sent_with_password(mockdata, client, ses
             follow_redirects=True
         )
 
-        assert b'An email with instructions to confirm your new email' in rv.data
+        assert 'An email with instructions to confirm your new email' in rv.data
 
 
 def test_user_can_change_email_with_valid_reset_token(mockdata, client, session):
@@ -233,7 +230,7 @@ def test_user_can_change_email_with_valid_reset_token(mockdata, client, session)
             follow_redirects=True
         )
 
-        assert b'Your email address has been updated.' in rv.data
+        assert 'Your email address has been updated.' in rv.data
 
 
 def test_user_cannot_change_email_with_invalid_reset_token(mockdata, client, session):
@@ -246,7 +243,7 @@ def test_user_cannot_change_email_with_invalid_reset_token(mockdata, client, ses
             follow_redirects=True
         )
 
-        assert b'Your email address has been updated.' not in rv.data
+        assert 'Your email address has been updated.' not in rv.data
 
 
 def test_user_can_confirm_account_with_valid_token(mockdata, client, session):
@@ -260,7 +257,7 @@ def test_user_can_confirm_account_with_valid_token(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'You have confirmed your account.' in rv.data
+        assert 'You have confirmed your account.' in rv.data
 
 
 def test_user_can_not_confirm_account_with_invalid_token(mockdata, client,
@@ -274,7 +271,7 @@ def test_user_can_not_confirm_account_with_invalid_token(mockdata, client,
             follow_redirects=True
         )
 
-        assert b'The confirmation link is invalid or has expired.' in rv.data
+        assert 'The confirmation link is invalid or has expired.' in rv.data
 
 
 def test_user_can_change_password_if_they_match(mockdata, client, session):
@@ -290,7 +287,7 @@ def test_user_can_change_password_if_they_match(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'Your password has been updated.' in rv.data
+        assert 'Your password has been updated.' in rv.data
 
 
 def login_unconfirmed_user(client):
@@ -315,7 +312,7 @@ def test_unconfirmed_user_redirected_to_confirm_account(mockdata, client,
             follow_redirects=False
         )
 
-        assert b'Please Confirm Your Account' in rv.data
+        assert 'Please Confirm Your Account' in rv.data
 
 
 def test_user_cannot_change_password_if_they_dont_match(mockdata, client,
@@ -332,7 +329,7 @@ def test_user_cannot_change_password_if_they_dont_match(mockdata, client,
             follow_redirects=True
         )
 
-        assert b'Passwords must match' in rv.data
+        assert 'Passwords must match' in rv.data
 
 
 def test_user_can_change_dept_pref(mockdata, client, session):
@@ -349,7 +346,7 @@ def test_user_can_change_dept_pref(mockdata, client, session):
             follow_redirects=True
         )
 
-        assert b'Updated!' in rv.data
+        assert 'Updated!' in rv.data
 
         user = User.query.filter_by(email='jen@example.org').one()
         assert user.dept_pref == test_department_id

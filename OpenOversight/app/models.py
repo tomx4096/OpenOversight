@@ -1,9 +1,5 @@
 import re
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
-
+from urlparse import urlparse
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy import UniqueConstraint
@@ -111,9 +107,9 @@ class Assignment(db.Model):
     __tablename__ = 'assignments'
 
     id = db.Column(db.Integer, primary_key=True)
-    officer_id = db.Column(db.Integer, db.ForeignKey('officers.id', ondelete='CASCADE'))
+    officer_id = db.Column(db.Integer, db.ForeignKey('officers.id'))
     baseofficer = db.relationship('Officer')
-    star_no = db.Column(db.String(120), index=True, unique=False, nullable=True)
+    star_no = db.Column(db.String(120), index=True, unique=False)
     rank = db.Column(db.String(120), index=True, unique=False)
     unit = db.Column(db.Integer, db.ForeignKey('unit_types.id'), nullable=True)
     star_date = db.Column(db.Date, index=True, unique=False, nullable=True)
@@ -240,20 +236,6 @@ class Location(db.Model):
     @validates('state')
     def validate_state(self, key, state):
         return state_validator(state)
-
-    def __repr__(self):
-        if self.street_name and self.cross_street2:
-            return 'Intersection of {} and {}, {} {}'.format(
-                self.street_name, self.cross_street2, self.city, self.state)
-        elif self.street_name and self.cross_street1:
-            return 'Intersection of {} and {}, {} {}'.format(
-                self.street_name, self.cross_street1, self.city, self.state)
-        elif self.street_name and self.cross_street1 and self.cross_street2:
-            return 'Intersection of {} between {} and {}, {} {}'.format(
-                self.street_name, self.cross_street1, self.cross_street2,
-                self.city, self.state)
-        else:
-            return '{} {}'.format(self.city, self.state)
 
 
 class LicensePlate(db.Model):
